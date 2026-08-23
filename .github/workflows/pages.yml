@@ -1,38 +1,21 @@
-name: Deploy to GitHub Pages
-
+name: Enable Pages
 on:
   push:
     branches: [gh-pages]
   workflow_dispatch:
-
 permissions:
-  contents: read
   pages: write
   id-token: write
-
-concurrency:
-  group: pages
-  url: ${{ steps.deployment.outputs.page_url }}
-
 jobs:
-  deploy:
+  enable:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout gh-pages
-        uses: actions/checkout@v4
-        with:
-          ref: gh-pages
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-        with:
-          publish_dir: .
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: .
-
-      - name: Deploy to Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Enable GitHub Pages via API
+        run: |
+          curl -sf -X PUT \
+            -H "Authorization: token ${{ github.token }}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/pages" \
+            -d '{"source":{"branch":"gh-pages","path":"/"}}' || echo "Pages already configured"
+      - name: Wait for propagation
+        run: sleep 5

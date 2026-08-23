@@ -1,14 +1,11 @@
 name: Enable Pages
-
 on:
   push:
     branches: [gh-pages]
   workflow_dispatch:
-
 permissions:
   pages: write
   id-token: write
-
 jobs:
   enable:
     runs-on: ubuntu-latest
